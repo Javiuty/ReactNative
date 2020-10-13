@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { FlatList, StyleSheet } from "react-native";
+import { FlatList, StyleSheet, TouchableOpacity, Text } from "react-native";
 import PalettePreview from "./PalettePreview";
 
 const Home = ({ navigation }) => {
   const [colorPalettes, setColorPalettes] = useState([]);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const fetchColorPalettes = useCallback(async () => {
     const result = await fetch(
@@ -20,6 +21,14 @@ const Home = ({ navigation }) => {
     fetchColorPalettes();
   }, []);
 
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    await fetchColorPalettes();
+    setTimeout(() => {
+      setIsRefreshing(false);
+    }, 1000);
+  }, []);
+
   return (
     <FlatList
       style={styles.list}
@@ -33,6 +42,17 @@ const Home = ({ navigation }) => {
           colorPalette={item}
         />
       )}
+      refreshing={true}
+      onRefresh={handleRefresh}
+      ListHeaderComponent={
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate("ColorPaletteModal");
+          }}
+        >
+          <Text>Launch Modal</Text>
+        </TouchableOpacity>
+      }
     />
   );
 };
